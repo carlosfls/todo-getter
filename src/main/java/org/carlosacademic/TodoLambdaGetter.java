@@ -3,10 +3,9 @@ package org.carlosacademic;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import org.carlosacademic.model.CreateTodo;
-import org.carlosacademic.model.TodoDTO;
 import org.carlosacademic.proxy.TodoProxy;
 
-public class TodoLambdaGetter implements RequestHandler<CreateTodo, TodoDTO> {
+public class TodoLambdaGetter implements RequestHandler<CreateTodo, String> {
 
     private final TodoProxy proxy;
 
@@ -15,7 +14,7 @@ public class TodoLambdaGetter implements RequestHandler<CreateTodo, TodoDTO> {
     }
 
     @Override
-    public TodoDTO handleRequest(CreateTodo input, Context context) {
+    public String handleRequest(CreateTodo input, Context context) {
         return proxy.getTodo(input.id(), context);
     }
 }
