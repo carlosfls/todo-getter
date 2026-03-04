@@ -10,14 +10,17 @@ import java.net.http.HttpResponse;
 
 public class TodoProxy {
 
-    private static final String API_URL = System.getenv("TODO_API_URL");
+    private final String API_URL;
+    private final HttpClient client;
 
-    public TodoProxy() {
+    public TodoProxy(String API_URL, HttpClient client) {
+        this.API_URL = API_URL;
+        this.client = client;
     }
 
     public String getTodo(String id, Context context) {
         LambdaLogger logger = context.getLogger();
-        try (HttpClient client = HttpClient.newHttpClient()){
+        try {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(API_URL +"/todos/"+id))
                     .GET()

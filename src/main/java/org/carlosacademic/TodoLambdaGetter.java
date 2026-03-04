@@ -5,15 +5,23 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import org.carlosacademic.model.CreateTodo;
 import org.carlosacademic.proxy.TodoProxy;
 import org.carlosacademic.service.TodoProcessor;
+import software.amazon.awssdk.services.sqs.SqsClient;
+
+import java.net.http.HttpClient;
 
 public class TodoLambdaGetter implements RequestHandler<CreateTodo, String> {
+
+    private static final String API_URL = System.getenv("TODO_API_URL");
+    private static final String QUEUE_URL = System.getenv("TODO_QUEUE_URL");
+    private static final HttpClient client = HttpClient.newHttpClient();
+    private static final SqsClient sqsClient = SqsClient.create();
 
     private final TodoProxy proxy;
     private final TodoProcessor processor;
 
     public TodoLambdaGetter() {
-        this.proxy = new TodoProxy();
-        this.processor = new TodoProcessor();
+        this.proxy = new TodoProxy(API_URL, client);
+        this.processor = new TodoProcessor(QUEUE_URL, sqsClient);
     }
 
     @Override

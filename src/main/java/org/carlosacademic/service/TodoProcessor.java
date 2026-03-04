@@ -6,11 +6,13 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
 public class TodoProcessor {
-    private static final String QUEUE_URL = System.getenv("TODO_QUEUE_URL");
+
+    private final String QUEUE_URL;
     private final SqsClient sqsClient;
 
-    public TodoProcessor() {
-        this.sqsClient = SqsClient.create();
+    public TodoProcessor(String QUEUE_URL, SqsClient sqsClient) {
+        this.QUEUE_URL = QUEUE_URL;
+        this.sqsClient = sqsClient;
     }
 
     public String processTodo(String todo, Context context) {
