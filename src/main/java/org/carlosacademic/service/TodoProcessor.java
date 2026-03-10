@@ -1,7 +1,6 @@
 package org.carlosacademic.service;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
+import org.slf4j.Logger;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
@@ -15,10 +14,9 @@ public class TodoProcessor {
         this.sqsClient = sqsClient;
     }
 
-    public String processTodo(String todo, Context context) {
-        LambdaLogger logger = context.getLogger();
+    public String processTodo(String todo, Logger logger) {
         if (todo !=null){
-            logger.log("Sending to sqs");
+            logger.info("Sending to sqs");
             SendMessageRequest request = SendMessageRequest.builder()
                     .queueUrl(QUEUE_URL)
                     .messageBody(todo)

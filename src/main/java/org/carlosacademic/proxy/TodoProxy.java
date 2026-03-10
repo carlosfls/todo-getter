@@ -2,6 +2,7 @@ package org.carlosacademic.proxy;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
+import org.slf4j.Logger;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,8 +19,7 @@ public class TodoProxy {
         this.client = client;
     }
 
-    public String getTodo(String id, Context context) {
-        LambdaLogger logger = context.getLogger();
+    public String getTodo(String id, Logger logger) {
         try {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(API_URL +"/todos/"+id))
@@ -29,14 +29,14 @@ public class TodoProxy {
             HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if(response.statusCode() == 200 && response.body()!=null){
-                logger.log("The todo was obtained successfully");
+                logger.info("The todo was obtained successfully");
                 return response.body();
             }else{
-                logger.log("Failed creating todo whith status code: "+ response.statusCode());
+                logger.info("Failed creating todo whith status code: {}", response.statusCode());
                 return null;
             }
         }catch (Exception e){
-            logger.log("Error creating the todo "+ e.getMessage());
+            logger.info("Error creating the todo {}", e.getMessage());
         }
         return null;
     }
