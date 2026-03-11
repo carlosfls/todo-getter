@@ -14,16 +14,15 @@ public class TodoProcessor {
         this.sqsClient = sqsClient;
     }
 
-    public String processTodo(String todo, Logger logger) {
-        if (todo !=null){
-            logger.info("Sending to sqs");
-            SendMessageRequest request = SendMessageRequest.builder()
-                    .queueUrl(QUEUE_URL)
-                    .messageBody(todo)
-                    .build();
-            sqsClient.sendMessage(request);
-            return "Todo published to SQS";
-        }
-        return "Error creating the todo";
+    public void processTodo(String todo, Logger logger) {
+        logger.info("Sending to sqs");
+        SendMessageRequest request = SendMessageRequest.builder()
+                .queueUrl(QUEUE_URL)
+                .messageBody(todo)
+                .build();
+
+        sqsClient.sendMessage(request);
+
+        logger.info("Todo published to SQS");
     }
 }

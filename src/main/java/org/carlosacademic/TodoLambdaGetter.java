@@ -2,6 +2,8 @@ package org.carlosacademic;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import org.carlosacademic.exceptions.ApiException;
+import org.carlosacademic.model.ApiResponseDto;
 import org.carlosacademic.model.CreateTodo;
 import org.carlosacademic.proxy.TodoProxy;
 import org.carlosacademic.service.TodoProcessor;
@@ -11,7 +13,7 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 
 import java.net.http.HttpClient;
 
-public class TodoLambdaGetter implements RequestHandler<CreateTodo, String> {
+public class TodoLambdaGetter implements RequestHandler<CreateTodo, ApiResponseDto> {
 
     private static final Logger logger = LoggerFactory.getLogger(TodoLambdaGetter.class);
 
@@ -29,11 +31,25 @@ public class TodoLambdaGetter implements RequestHandler<CreateTodo, String> {
     }
 
     @Override
-    public String handleRequest(CreateTodo input, Context context) {
-        String todo = proxy.getTodo(input.id(), logger);
+    public ApiResponseDto handleRequest(CreateTodo input, Context context) {
+        try {
+            String todo = proxy.getTodo(input, logger);
 
-        context.getLogger().log("Request id: " + context.getAwsRequestId() + "");
+            logger.info("Request id: {} ",context.getAwsRequestId());
 
-        return processor.processTodo(todo, logger);
+            processor.processTodo(todo, logger);
+
+            return new ApiResponseDto(200, "Todo Sent successfully");
+        }catch (ApiException e){
+            logger.error("Business error: {}",e.getMessage());
+           return getApiResponseError(e);
+        }catch (Exception e) {
+            logger.error("Unexpected error: {}",e.getMessage());
+            return new ApiResponseDto(500, "Internal Server Error");
+        }
+    }
+
+    private ApiResponseDto getApiResponseError(ApiException e){
+        return new ApiResponseDto(e.getStatusCode(), e.getMessage());
     }
 }
