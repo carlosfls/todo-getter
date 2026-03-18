@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
 import java.net.http.HttpClient;
+import java.util.UUID;
 
 public class TodoLambdaGetter implements RequestHandler<CreateTodo, ApiResponseDto> {
 
@@ -32,19 +33,19 @@ public class TodoLambdaGetter implements RequestHandler<CreateTodo, ApiResponseD
 
     @Override
     public ApiResponseDto handleRequest(CreateTodo input, Context context) {
+        String correlationId = context.getAwsRequestId();
+
         try {
-            String todo = proxy.getTodo(input, logger);
-
-            logger.info("Request id: {} ",context.getAwsRequestId());
-
-            processor.processTodo(todo, logger);
+            String todo = proxy.getTodo(input, logger, correlationId);
+            logger.info("EVENT=GET_TODO todoId={} requestId={}", input.id(), correlationId);
+            processor.processTodo(todo, logger, correlationId);
 
             return new ApiResponseDto(200, "Todo Sent successfully");
         }catch (ApiException e){
-            logger.error("Business error: {}",e.getMessage());
+            logger.error("Business error: {} requestId={}",e.getMessage(), correlationId);
            return getApiResponseError(e);
         }catch (Exception e) {
-            logger.error("Unexpected error: {}",e.getMessage());
+            logger.error("Unexpected error: {} requestId={}",e.getMessage(), correlationId);
             return new ApiResponseDto(500, "Internal Server Error");
         }
     }

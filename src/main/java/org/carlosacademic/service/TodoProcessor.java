@@ -2,7 +2,10 @@ package org.carlosacademic.service;
 
 import org.slf4j.Logger;
 import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+
+import java.util.Map;
 
 public class TodoProcessor {
 
@@ -14,15 +17,21 @@ public class TodoProcessor {
         this.sqsClient = sqsClient;
     }
 
-    public void processTodo(String todo, Logger logger) {
-        logger.info("Sending to sqs");
+    public void processTodo(String todo, Logger logger, String correlationId) {
+        logger.info("EVENT=PROCESS_TODO todo={} requestId={}", todo, correlationId);
         SendMessageRequest request = SendMessageRequest.builder()
                 .queueUrl(QUEUE_URL)
                 .messageBody(todo)
+                .messageAttributes(Map.of(
+                        "correlationId", MessageAttributeValue.builder()
+                                            .stringValue(correlationId)
+                                            .dataType("String")
+                                            .build()
+                ))
                 .build();
 
         sqsClient.sendMessage(request);
 
-        logger.info("Todo published to SQS");
+        logger.info("EVENT=PROCESS_TODO STATUS_SUCCESS todo={} requestId={}", todo, correlationId);
     }
 }

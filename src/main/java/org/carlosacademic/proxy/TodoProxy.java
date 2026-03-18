@@ -20,7 +20,7 @@ public class TodoProxy {
         this.client = client;
     }
 
-    public String getTodo(CreateTodo todo, Logger logger) throws IOException, InterruptedException {
+    public String getTodo(CreateTodo todo, Logger logger, String correlationId) throws IOException, InterruptedException {
         if (todo == null || todo.id() == null) {
             throw new ApiException(400, "Invalid Todo body");
         }
@@ -33,10 +33,10 @@ public class TodoProxy {
         HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
         if(response.statusCode() == 200 && response.body()!=null){
-            logger.info("The todo was obtained successfully");
+            logger.info("EVENT=GET_TODO STATUS={} requestId={}", response.statusCode(), correlationId);
             return response.body();
         }else{
-            logger.warn("Failed obtaining todo with status code: {}", response.statusCode());
+            logger.warn("Failed obtaining todo with status code={} requestId={}", response.statusCode(),  correlationId);
             throw new ApiException(response.statusCode(), "Failed obtaing the todo: " + response.body());
         }
     }
