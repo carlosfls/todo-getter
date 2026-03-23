@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
 import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.UUID;
 
 public class TodoLambdaGetter implements RequestHandler<CreateTodo, ApiResponseDto> {
@@ -20,7 +21,11 @@ public class TodoLambdaGetter implements RequestHandler<CreateTodo, ApiResponseD
 
     private static final String API_URL = System.getenv("TODO_API_URL");
     private static final String QUEUE_URL = System.getenv("TODO_QUEUE_URL");
-    private static final HttpClient client = HttpClient.newHttpClient();
+
+    private static final HttpClient client = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(3))
+            .build();
+
     private static final SqsClient sqsClient = SqsClient.create();
 
     private final TodoProxy proxy;
