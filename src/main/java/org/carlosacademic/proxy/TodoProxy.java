@@ -3,7 +3,6 @@ package org.carlosacademic.proxy;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import org.carlosacademic.exceptions.ApiException;
 import org.carlosacademic.model.CreateTodo;
-import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.URI;

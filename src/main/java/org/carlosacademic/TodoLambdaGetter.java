@@ -8,13 +8,10 @@ import org.carlosacademic.model.ApiResponseDto;
 import org.carlosacademic.model.CreateTodo;
 import org.carlosacademic.proxy.TodoProxy;
 import org.carlosacademic.service.TodoProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
 import java.net.http.HttpClient;
 import java.time.Duration;
-import java.util.UUID;
 
 public class TodoLambdaGetter implements RequestHandler<CreateTodo, ApiResponseDto> {
 
