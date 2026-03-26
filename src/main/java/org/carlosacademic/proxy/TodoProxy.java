@@ -38,7 +38,7 @@ public class TodoProxy {
         if(response.statusCode() == 200 && response.body()!=null){
             return response.body();
         }else{
-            logger.log("Failed to get the TODO with id: "+ todo.id() + "Request id: " + correlationId);
+            logger.log("Failed to get the TODO with id: "+ todo.id() + " Request id: " + correlationId);
             throw new ApiException(response.statusCode(), "Failed obtaing the todo: " + response.body());
         }
     }

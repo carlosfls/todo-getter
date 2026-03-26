@@ -41,10 +41,10 @@ public class TodoLambdaGetter implements RequestHandler<CreateTodo, ApiResponseD
         LambdaLogger logger = context.getLogger();
 
         try {
-            logger.log("Getting TODO with id: "+ input.id() + "Request id: " + correlationId);
+            logger.log("Getting TODO with id: "+ input.id() + " Request id: " + correlationId);
             String todo = proxy.getTodo(input, logger, correlationId);
 
-            logger.log("Processing TODO with id: "+ input.id() + "Request id: " + correlationId);
+            logger.log("Processing TODO with id: "+ input.id() + " Request id: " + correlationId);
             processor.processTodo(todo, logger, correlationId);
 
             return new ApiResponseDto(200, "Todo Sent successfully");

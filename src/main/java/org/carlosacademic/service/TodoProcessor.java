@@ -18,7 +18,7 @@ public class TodoProcessor {
     }
 
     public void processTodo(String todo, LambdaLogger logger, String correlationId) {
-        logger.log("Sending TODO with id to sqs. Request id: " + correlationId);
+        logger.log("Sending TODO to sqs. Request id: " + correlationId);
 
         SendMessageRequest request = SendMessageRequest.builder()
                 .queueUrl(QUEUE_URL)
