@@ -1,6 +1,6 @@
 package org.carlosacademic.service;
 
-import org.slf4j.Logger;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
@@ -17,8 +17,9 @@ public class TodoProcessor {
         this.sqsClient = sqsClient;
     }
 
-    public void processTodo(String todo, Logger logger, String correlationId) {
-        logger.info("EVENT=PROCESS_TODO todo={} requestId={}", todo, correlationId);
+    public void processTodo(String todo, LambdaLogger logger, String correlationId) {
+        logger.log("Sending TODO with id to sqs. Request id: " + correlationId);
+
         SendMessageRequest request = SendMessageRequest.builder()
                 .queueUrl(QUEUE_URL)
                 .messageBody(todo)
@@ -31,7 +32,5 @@ public class TodoProcessor {
                 .build();
 
         sqsClient.sendMessage(request);
-
-        logger.info("EVENT=PROCESS_TODO STATUS_SUCCESS todo={} requestId={}", todo, correlationId);
     }
 }

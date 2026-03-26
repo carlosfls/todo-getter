@@ -1,6 +1,7 @@
 package org.carlosacademic;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import org.carlosacademic.exceptions.ApiException;
 import org.carlosacademic.model.ApiResponseDto;
@@ -16,8 +17,6 @@ import java.time.Duration;
 import java.util.UUID;
 
 public class TodoLambdaGetter implements RequestHandler<CreateTodo, ApiResponseDto> {
-
-    private static final Logger logger = LoggerFactory.getLogger(TodoLambdaGetter.class);
 
     private static final String API_URL = System.getenv("TODO_API_URL");
     private static final String QUEUE_URL = System.getenv("TODO_QUEUE_URL");
@@ -39,18 +38,21 @@ public class TodoLambdaGetter implements RequestHandler<CreateTodo, ApiResponseD
     @Override
     public ApiResponseDto handleRequest(CreateTodo input, Context context) {
         String correlationId = context.getAwsRequestId();
+        LambdaLogger logger = context.getLogger();
 
         try {
+            logger.log("Getting TODO with id: "+ input.id() + "Request id: " + correlationId);
             String todo = proxy.getTodo(input, logger, correlationId);
-            logger.info("EVENT=GET_TODO todoId={} requestId={}", input.id(), correlationId);
+
+            logger.log("Processing TODO with id: "+ input.id() + "Request id: " + correlationId);
             processor.processTodo(todo, logger, correlationId);
 
             return new ApiResponseDto(200, "Todo Sent successfully");
         }catch (ApiException e){
-            logger.error("Business error: {} requestId={}",e.getMessage(), correlationId);
+            logger.log("Business error: "+e.getMessage()+" Request id: "+ correlationId);
            return getApiResponseError(e);
         }catch (Exception e) {
-            logger.error("Unexpected error: {} requestId={}",e.getMessage(), correlationId);
+            logger.log("Unexpected error: "+e.getMessage()+" Request id: "+ correlationId);
             return new ApiResponseDto(500, "Internal Server Error");
         }
     }
