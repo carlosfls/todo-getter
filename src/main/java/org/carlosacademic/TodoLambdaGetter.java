@@ -3,11 +3,13 @@ package org.carlosacademic;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.xray.interceptors.TracingInterceptor;
 import org.carlosacademic.exceptions.ApiException;
 import org.carlosacademic.model.ApiResponseDto;
 import org.carlosacademic.model.CreateTodo;
 import org.carlosacademic.proxy.TodoProxy;
 import org.carlosacademic.service.TodoProcessor;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
 import java.net.http.HttpClient;
@@ -22,7 +24,11 @@ public class TodoLambdaGetter implements RequestHandler<CreateTodo, ApiResponseD
             .connectTimeout(Duration.ofSeconds(3))
             .build();
 
-    private static final SqsClient sqsClient = SqsClient.create();
+    private static final SqsClient sqsClient = SqsClient.builder()
+            .overrideConfiguration(ClientOverrideConfiguration.builder()
+                    .addExecutionInterceptor(new TracingInterceptor())
+                    .build())
+            .build();
 
     private final TodoProxy proxy;
     private final TodoProcessor processor;
