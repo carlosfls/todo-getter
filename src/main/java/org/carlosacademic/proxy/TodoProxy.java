@@ -34,11 +34,34 @@ public class TodoProxy {
 
         HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
+
+
         if(response.statusCode() == 200 && response.body()!=null){
             return response.body();
         }else{
             logger.log("Failed to get the TODO with id: "+ todo.id() + " Request id: " + correlationId);
             throw new ApiException(response.statusCode(), "Failed obtaing the todo: " + response.body());
+        }
+    }
+
+    public String getUser(Integer userId, LambdaLogger logger, String correlationId) throws IOException, InterruptedException {
+        if (userId == null) {
+            throw new ApiException(400, "Invalid User id");
+        }
+
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .timeout(Duration.ofSeconds(5))
+                .uri(URI.create(API_URL +"/users/"+ userId))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+        if(response.statusCode() == 200 && response.body()!=null){
+            return response.body();
+        }else{
+            logger.log("Failed to get the USER with id: "+ userId + " Request id: " + correlationId);
+            throw new ApiException(response.statusCode(), "Failed obtaing the user: " + response.body());
         }
     }
 }
