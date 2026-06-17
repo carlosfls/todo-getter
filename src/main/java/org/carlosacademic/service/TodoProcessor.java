@@ -18,12 +18,12 @@ public class TodoProcessor {
         this.sqsClient = sqsClient;
     }
 
-    public void processTodo(TodoFullDTO todo, LambdaLogger logger, String correlationId) {
+    public void processTodo(String todo, LambdaLogger logger, String correlationId) {
         logger.log("Sending TODO to sqs. Request id: " + correlationId);
 
         SendMessageRequest request = SendMessageRequest.builder()
                 .queueUrl(QUEUE_URL)
-                .messageBody(todo.toString())
+                .messageBody(todo)
                 .messageAttributes(Map.of(
                         "correlationId", MessageAttributeValue.builder()
                                             .stringValue(correlationId)

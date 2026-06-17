@@ -61,7 +61,9 @@ public class TodoLambdaGetter implements RequestHandler<CreateTodo, ApiResponseD
             TodoFullDTO todoFullDTO = buildTodoFull(dto, userDTO);
 
             logger.log("Processing TODO with id: "+ input.id() + " and user id: "+ userDTO.id() + " Request id: " + correlationId);
-            processor.processTodo(todoFullDTO, logger, correlationId);
+            String todoEvent = mapper.writeValueAsString(todoFullDTO);
+
+            processor.processTodo(todoEvent, logger, correlationId);
 
             return new ApiResponseDto(200, "Todo Sent successfully");
         }catch (ApiException e){
